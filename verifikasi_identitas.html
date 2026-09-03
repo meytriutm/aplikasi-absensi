@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Verifikasi Absensi</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed": "#001a41", "surface-container": "#1e2024",
+            "surface-container-low": "#1a1c20", "outline-variant": "#414755",
+            "outline": "#8b90a0", "on-surface": "#e2e2e8",
+            "on-surface-variant": "#c1c6d7", "soft-blue": "#70c5ff",
+            "soft-blue-dim": "#4da6ff", "surface": "#111318"
+          },
+          fontFamily: {
+            "body-md": ["Geist"], "body-sm": ["Geist"],
+            "headline-lg-mobile": ["Space Grotesk"], "headline-md": ["Space Grotesk"],
+            "label-sm": ["JetBrains Mono"], "label-md": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "body-md": ["16px", {lineHeight:"24px", fontWeight:"400"}],
+            "body-sm": ["14px", {lineHeight:"20px", fontWeight:"400"}],
+            "headline-lg-mobile": ["28px", {lineHeight:"36px", fontWeight:"600"}],
+            "label-sm": ["10px", {lineHeight:"14px", letterSpacing:"0.08em", fontWeight:"500"}],
+            "label-md": ["12px", {lineHeight:"16px", letterSpacing:"0.05em", fontWeight:"500"}]
+          },
+          spacing: {
+            "xs":"4px","sm":"8px","md":"16px","lg":"24px","xl":"40px",
+            "gutter":"24px","margin-mobile":"16px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #111318; color: #e2e2e8; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-card { background: rgba(30,32,36,0.4); backdrop-filter: blur(16px); border: 1px solid rgba(112,197,255,0.15); }
+    .soft-glow-border { border-color: rgba(112,197,255,0.5); box-shadow: 0 0 12px rgba(112,197,255,0.2); }
+    .mono-gradient { background: linear-gradient(180deg, #333539 0%, #111318 100%); }
+    .pulse-glow { animation: pulseGlow 3s infinite alternate; }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(112,197,255,0.05); }
+      to { box-shadow: 0 0 20px rgba(112,197,255,0.15); }
+    }
+    .scan-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(112,197,255,0.4), transparent);
+      animation: scanMove 3.5s infinite ease-in-out;
+    }
+    @keyframes scanMove {
+      0%, 100% { top: 10%; opacity: 0; }
+      50% { top: 90%; opacity: 1; }
+    }
+    #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    #overlay-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
+    .sukses-border { border-color: rgba(34,197,94,0.5) !important; box-shadow: 0 0 20px rgba(34,197,94,0.2) !important; }
+  </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden bg-[#111318]">
+
+  <!-- Header -->
+  <header class="w-full top-0 sticky bg-[#111318]/90 backdrop-blur-md flex justify-between items-center px-md py-sm z-50 border-b border-white/10">
+    <h1 class="font-headline-lg-mobile tracking-tighter font-bold text-on-surface">ABSENSI</h1>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-4 py-6 pb-32 space-y-6">
+    <section class="text-center">
+      <h2 class="font-headline-lg-mobile text-on-surface uppercase">Verifikasi Identitas</h2>
+      <p id="status-text" class="text-on-surface-variant text-sm mt-1">Memuat model AI...</p>
+    </section>
+
+    <!-- Kamera -->
+    <section class="flex flex-col items-center">
+      <div id="kamera-box" class="relative w-full max-w-[400px] aspect-square rounded-xl overflow-hidden glass-card border-2 border-soft-blue/10 pulse-glow">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay-canvas"></canvas>
+
+        <!-- Corners -->
+        <div class="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 soft-glow-border pointer-events-none"></div>
+        <div class="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 soft-glow-border pointer-events-none"></div>
+        <div class="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 soft-glow-border pointer-events-none"></div>
+        <div class="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 soft-glow-border pointer-events-none"></div>
+
+        <!-- Scan line -->
+        <div class="scan-line absolute left-0 right-0 pointer-events-none"></div>
+
+        <!-- Match badge -->
+        <div class="absolute top-3 right-3 z-10">
+          <div id="match-badge" class="glass-card px-2 py-1 rounded-lg border border-outline-variant flex items-center gap-1">
+            <div class="w-2 h-2 rounded-full bg-soft-blue animate-pulse"></div>
+            <span id="match-text" class="font-label-sm text-label-sm tracking-widest text-on-surface-variant">SCANNING...</span>
+          </div>
+        </div>
+
+        <!-- Status label -->
+        <div class="absolute bottom-3 left-0 right-0 flex justify-center z-10">
+          <div id="status-label" class="bg-surface-container/90 backdrop-blur-xl px-6 py-2 rounded-full border border-outline-variant flex items-center gap-3 shadow-xl">
+            <span id="status-icon" class="material-symbols-outlined text-[20px] animate-spin text-soft-blue">refresh</span>
+            <span id="status-label-text" class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface">Memuat AI...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Karyawan -->
+    <section class="glass-card rounded-xl p-6 space-y-6 relative overflow-hidden border border-outline-variant">
+      <div class="absolute top-0 right-0 p-4 opacity-[0.05] select-none pointer-events-none">
+        <span class="material-symbols-outlined text-[120px] text-soft-blue">verified_user</span>
+      </div>
+  
+      <!-- Tanggal -->
+      <div>
+        <p class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Waktu Absensi</p>
+        <p id="tgl-absensi" class="text-soft-blue font-label-md text-xl uppercase mt-1"></p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-outline-variant pt-6">
+        <!-- Nama -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg mono-gradient flex items-center justify-center border border-soft-blue/10">
+            <span class="material-symbols-outlined text-soft-blue">badge</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-outline uppercase">Nama Karyawan</p>
+            <p id="info-nama" class="text-on-surface font-body-md mt-1">-</p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg mono-gradient flex items-center justify-center border border-soft-blue/10">
+            <span class="material-symbols-outlined text-soft-blue">mail</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-outline uppercase">Email</p>
+            <p id="info-email" class="text-on-surface font-body-md mt-1">-</p>
+          </div>
+        </div>
+
+        <!-- Waktu -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg mono-gradient flex items-center justify-center border border-soft-blue/10">
+            <span class="material-symbols-outlined text-soft-blue">schedule</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-outline uppercase">Waktu Pencatatan</p>
+            <p id="info-waktu" class="text-on-surface font-body-md mt-1">-</p>
+          </div>
+        </div>
+
+        <!-- Lokasi -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg mono-gradient flex items-center justify-center border border-soft-blue/10">
+            <span class="material-symbols-outlined text-soft-blue">location_on</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-outline uppercase">Lokasi</p>
+            <p id="info-lokasi" class="text-on-surface font-body-md mt-1">-</p>
+          </div>
+        </div>
+
+        <!-- Jabatan -->
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg mono-gradient flex items-center justify-center border border-soft-blue/10">
+            <span class="material-symbols-outlined text-soft-blue">work</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-outline uppercase">Posisi / Jabatan</p>
+            <p id="info-jabatan" class="text-on-surface font-body-md mt-1">-</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Konfirmasi -->
+     <section>
+       <div id="pesan-konfirmasi" class="hidden mt-4 p-4 rounded-xl text-center font-body-md"></div>
+     </section>
+     </main>
+
+  <!-- Bottom Nav -->
+   <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 py-3 bg-[#111318]/95 backdrop-blur-lg border-t border-white/10">
+    <a href="login.html" class="flex flex-col items-center text-on-surface-variant hover:text-soft-blue transition-all">
+      <span class="material-symbols-outlined">home</span>
+      <span class="font-label-sm text-label-sm mt-1">Home</span>
+    </a>
+     <a href="konfirmasi_absen.html" class="flex flex-col items-center text-on-surface-variant hover:text-soft-blue transition-all">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">face_unlock</span>
+      <span class="font-label-sm text-label-sm mt-1">Verify</span>
+    </a>
+     <a href="riwayat_aktivitas.html" class="flex flex-col items-center text-on-surface-variant hover:text-soft-blue transition-all">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">history</span>
+      <span class="font-label-sm text-label-sm mt-1">History</span>
+    </a>
+  </nav>
+
+  
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+      authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+      projectId: "aplikasi-absensi-wajah-81014",
+      storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+      messagingSenderId: "30260813821",
+      appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+    let karyawanDescriptors = [];
+    let statusAbsensi = sessionStorage.getItem('statusAbsen') || 'masuk';
+    let karyawanTerdeteksi = null;
+    let detectionInterval = null;
+    let lokasiKaryawan = 'Memuat lokasi...';
+
+    // Set tanggal
+    const now = new Date();
+    document.getElementById('tgl-absensi').textContent = now.toLocaleDateString('id-ID', {
+      weekday:'long', day:'numeric', month:'long', year:'numeric'
+    }).toUpperCase();
+
+    // Set waktu realtime
+    setInterval(() => {
+      document.getElementById('info-waktu').textContent = new Date().toLocaleTimeString('id-ID') + ' WIB';
+    }, 1000);
+
+    // Ambil lokasi GPS
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+          const data = await res.json();
+          const raw = data.address.village || data.address.suburb || data.address.city_district || data.address.city || 'Lokasi ditemukan';
+          const keywords = ['jaya','raya','baru','lama','indah','permai','agung','makmur','sejahtera','damai','mulya','mulia','sari','asri','maju','utama','timur','barat','selatan','utara','tengah','dalam','luar','atas','bawah'];
+          let lokasi = raw.toLowerCase();
+          keywords.forEach(k => { lokasi = lokasi.replace(new RegExp(`(\\w)(${k})`, 'gi'), '$1 $2'); });
+          lokasi = lokasi.replace(/\b\w/g, c => c.toUpperCase()).replace(/\s+/g, ' ').trim();
+          document.getElementById('info-lokasi').textContent = lokasi;
+          lokasiKaryawan = lokasi;
+        } catch {
+          document.getElementById('info-lokasi').textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        }
+      }, () => {
+        document.getElementById('info-lokasi').textContent = 'Izin lokasi ditolak';
+      });
+    } else {
+      document.getElementById('info-lokasi').textContent = 'GPS tidak tersedia';
+    }
+
+    window.setStatus = (status) => {
+      statusAbsensi = status;
+      document.getElementById('btn-masuk').className = status === 'masuk'
+        ? 'flex-1 py-1 rounded-md bg-soft-blue text-on-primary-fixed font-label-md font-bold uppercase transition-all'
+        : 'flex-1 py-1 rounded-md border border-soft-blue/30 text-soft-blue/60 font-label-md font-bold uppercase hover:bg-soft-blue/5 transition-all';
+      document.getElementById('btn-keluar').className = status === 'keluar'
+        ? 'flex-1 py-1 rounded-md bg-soft-blue text-on-primary-fixed font-label-md font-bold uppercase transition-all'
+        : 'flex-1 py-1 rounded-md border border-soft-blue/30 text-soft-blue/60 font-label-md font-bold uppercase hover:bg-soft-blue/5 transition-all';
+    };
+
+    function updateStatus(icon, text, spin = false) {
+      document.getElementById('status-text').textContent = text;
+      document.getElementById('status-label-text').textContent = text;
+      const iconEl = document.getElementById('status-icon');
+      iconEl.textContent = icon;
+      iconEl.className = `material-symbols-outlined text-[20px] text-soft-blue ${spin ? 'animate-spin' : ''}`;
+    }
+
+    // Load face-api models
+    updateStatus('refresh', 'Memuat model AI...', true);
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+    updateStatus('refresh', 'Memuat data karyawan...', true);
+
+    // Load karyawan dari Firestore
+    const snapshot = await getDocs(collection(db, 'karyawan'));
+    const karyawanList = [];
+    snapshot.forEach(doc => karyawanList.push({ id: doc.id, ...doc.data() }));
+
+    // Buat descriptor dari foto base64
+    for (const k of karyawanList) {
+      if (!k.fotoWajah) continue;
+      const img = await faceapi.fetchImage(k.fotoWajah);
+      const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks().withFaceDescriptor();
+      if (detection) {
+        karyawanDescriptors.push({
+          karyawan: k,
+          descriptor: detection.descriptor
+        });
+      }
+    }
+
+    updateStatus('videocam', 'Membuka kamera...', true);
+
+    // Buka kamera
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('overlay-canvas');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        updateStatus('face_unlock', 'Mendeteksi Wajah...', false);
+        mulaiDeteksi();
+      };
+    } catch (err) {
+      updateStatus('error', 'Kamera tidak bisa dibuka', false);
+    }
+
+    function mulaiDeteksi() {
+      detectionInterval = setInterval(async () => {
+        if (video.paused || video.ended) return;
+        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks().withFaceDescriptor();
+
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!detection) {
+          document.getElementById('match-text').textContent = 'SCANNING...';
+          updateStatus('face_unlock', 'Mendeteksi Wajah...', false);
+          return;
+        }
+
+        // Cocokkan dengan karyawan
+        let bestMatch = null;
+        let bestDistance = 0.5; // threshold
+        for (const k of karyawanDescriptors) {
+          const distance = faceapi.euclideanDistance(detection.descriptor, k.descriptor);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = k.karyawan;
+          }
+        }
+
+        const matchPct = Math.round((1 - bestDistance) * 100);
+        document.getElementById('match-text').textContent = `MATCH: ${matchPct}%`;
+
+       if (bestMatch) {
+      karyawanTerdeteksi = bestMatch;
+      document.getElementById('info-nama').textContent = bestMatch.nama;
+      document.getElementById('info-email').textContent = bestMatch.email;
+      document.getElementById('info-jabatan').textContent = bestMatch.jabatan;
+      document.getElementById('kamera-box').classList.add('sukses-border');
+      updateStatus('check_circle', 'Wajah Terkenali!', false);
+      document.getElementById('status-icon').style.color = '#22c55e';
+      clearInterval(detectionInterval);
+
+      // Auto konfirmasi setelah 2 detik
+      setTimeout(() => {
+        konfirmasiAbsensi();
+      }, 2000);
+    } else {
+          karyawanTerdeteksi = null;
+          document.getElementById('info-nama').textContent = 'Tidak dikenali';
+          document.getElementById('info-email').textContent = '-';
+          document.getElementById('info-jabatan').textContent = '-';
+          updateStatus('face_unlock', 'Wajah Tidak Dikenali', false);
+        }
+      }, 1000);
+    }
+
+    window.konfirmasiAbsensi = async () => {
+      if (!karyawanTerdeteksi) return;
+      
+
+      try {
+        await addDoc(collection(db, 'absensi'), {
+          karyawanId: karyawanTerdeteksi.id,
+          nama: karyawanTerdeteksi.nama,
+          email: karyawanTerdeteksi.email,
+          jabatan: karyawanTerdeteksi.jabatan,
+          status: statusAbsensi,
+          lokasi: lokasiKaryawan,
+          waktu: new Date().toISOString(),
+          tanggal: new Date().toLocaleDateString('id-ID')
+        });
+
+
+         sessionStorage.setItem('emailKaryawan', karyawanTerdeteksi.email);
+         sessionStorage.setItem('absensiSukses', JSON.stringify({
+          nama: karyawanTerdeteksi.nama,
+          jabatan: karyawanTerdeteksi.jabatan || karyawanTerdeteksi.posisi || '-',
+          status: statusAbsensi,
+          waktu: new Date().toLocaleTimeString('id-ID') + ' WIB',
+          lokasi: lokasiKaryawan 
+        }));
+
+        window.location.href = 'konfirmasi_absen.html';
+
+      } catch (err) {
+        const pesan = document.getElementById('pesan-konfirmasi');
+        pesan.textContent = 'Gagal menyimpan: ' + err.message;
+        pesan.className = 'mt-4 p-4 rounded-xl text-center font-body-md bg-red-900/40 text-red-300 border border-red-500/30';
+        pesan.classList.remove('hidden');
+      }
+    };
+  </script>
+
+  
+</body>
+</html>
+
+
+
+

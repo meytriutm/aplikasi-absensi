@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Absensi Berhasil</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "surface-container-low": "#1a1c20",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-secondary-fixed-variant": "#004f54",
+                    "surface-container": "#1e2024",
+                    "surface-container-high": "#282a2e",
+                    "inverse-primary": "#005bc1",
+                    "on-surface-variant": "#c1c6d7",
+                    "surface-container-highest": "#333539",
+                    "tertiary-fixed": "#e9ddff",
+                    "on-surface": "#e2e2e8",
+                    "surface-container-lowest": "#0c0e12",
+                    "secondary-fixed": "#74f5ff",
+                    "on-secondary-container": "#006a70",
+                    "on-primary-fixed": "#001a41",
+                    "outline-variant": "#414755",
+                    "on-primary-container": "#00285c",
+                    "background": "#111318",
+                    "tertiary": "#d1bcff",
+                    "surface-dim": "#111318",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-tint": "#adc6ff",
+                    "error-container": "#93000a",
+                    "tertiary-fixed-dim": "#d1bcff",
+                    "on-tertiary-container": "#34007f",
+                    "surface-variant": "#333539",
+                    "secondary": "#ddfcff",
+                    "on-secondary": "#00363a",
+                    "inverse-surface": "#e2e2e8",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#23005b",
+                    "tertiary-container": "#a178ff",
+                    "on-background": "#e2e2e8",
+                    "error": "#ffb4ab",
+                    "surface-bright": "#37393e",
+                    "primary": "#adc6ff",
+                    "on-error-container": "#ffdad6",
+                    "inverse-on-surface": "#2f3035",
+                    "on-tertiary": "#3c0090",
+                    "secondary-fixed-dim": "#00dbe7",
+                    "on-secondary-fixed": "#002022",
+                    "on-primary": "#002e69",
+                    "surface": "#111318",
+                    "secondary-container": "#00f1fe",
+                    "primary-container": "#4b8eff",
+                    "on-tertiary-fixed-variant": "#5700c9",
+                    "on-error": "#690005",
+                    "outline": "#8b90a0"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "spacing": {
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "container-max": "1440px",
+                    "margin-tablet": "32px",
+                    "gutter": "24px"
+                },
+                "fontFamily": {
+                    "body-sm": ["Geist"],
+                    "headline-lg": ["Space Grotesk"],
+                    "label-md": ["JetBrains Mono"],
+                    "label-sm": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Space Grotesk"],
+                    "body-lg": ["Geist"],
+                    "headline-xl": ["Space Grotesk"],
+                    "headline-md": ["Space Grotesk"],
+                    "body-md": ["Geist"]
+                },
+                "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                }
+            },
+        },
+    }
+  </script>
+  <style>
+    body {
+        background-color: #0A0C10;
+        color: #e2e2e8;
+        -webkit-font-smoothing: antialiased;
+    }
+    .glass-container {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    .glass-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
+        pointer-events: none;
+    }
+    .success-glow {
+        box-shadow: 0 0 40px rgba(0, 241, 254, 0.15);
+    }
+    .shimmer {
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        background-size: 200% 100%;
+        animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+  </style>
+  <style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+  <!-- Top App Bar -->
+  <header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+  </header>
+  <!-- Main Content -->
+   <header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-sm flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+   <button onclick="window.history.back()" class="mr-4 text-primary active:scale-95 transition-transform">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+</header>
+  <main class="flex-grow flex flex-col items-center justify-center px-margin-mobile pt-24 pb-32">
+    <!-- Background Atmospheric Glow -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+      <div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[120px]"></div>
+      <div class="absolute bottom-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-secondary/5 blur-[100px]"></div>
+    </div>
+    <!-- Confirmation Header Group -->
+    <div class="w-full max-w-md flex flex-col items-center text-center space-y-6">
+      <!-- Success Icon -->
+      <div class="relative">
+        <div class="w-24 h-24 rounded-full bg-secondary-container/10 flex items-center justify-center border border-secondary-container/20 success-glow">
+          <span class="material-symbols-outlined text-[48px] text-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        </div>
+        <!-- Radial pulse effect -->
+        <div class="absolute inset-0 w-24 h-24 rounded-full border border-secondary-container/40 animate-ping opacity-20"></div>
+      </div>
+      <!-- Titles -->
+      <div class="space-y-2">
+        <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase tracking-tight text-on-background">
+          ABSENSI BERHASIL
+        </h1>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] mx-auto">
+          Terima kasih, data kehadiran anda telah tersimpan.
+        </p>
+      </div>
+      <!-- Central Data Card -->
+      <div class="w-full glass-container rounded-xl p-8 mt-4 relative">
+        <div class="shimmer absolute inset-0 pointer-events-none opacity-50"></div>
+        <div class="space-y-8 relative z-10">
+          <!-- Employee Info -->
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-surface-container-low border border-white/10 mb-4 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary" style="font-size:40px;">account_circle</span>
+            </div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Ahmad Sulaiman</h2>
+            <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mt-1">Senior Cloud Architect</p>
+          </div>
+          <!-- Divider -->
+          <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          <!-- Time & Date -->
+          <div class="">
+            <div class="mb-6">
+              <div class="flex flex-col items-center">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Waktu</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-primary text-sm">schedule</span>
+                  <span class="font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">08:45 WIB</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Tanggal</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-primary text-sm">calendar_today</span>
+                  <span class="font-label-md text-label-md text-on-surface text-center leading-tight">24 Mei 2024</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-center pt-2 border-t border-white/5">
+              <span class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Lokasi</span>
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-sm">location_on</span>
+                <span class="font-label-md text-label-md text-on-surface text-center leading-tight">HQ - Lab Inovasi</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 py-3 bg-[#111318]/95 backdrop-blur-lg border-t border-white/10">
+    <a href="#" class="flex flex-col items-center text-on-surface-variant hover:text-soft-blue transition-all">
+      <span class="material-symbols-outlined">face_unlock</span>
+      <span class="font-label-sm text-label-sm mt-1"> Verify</span>
+    </a>
+  </nav>
+
+  <script>
+    // Micro-interaction for the card on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const card = document.querySelector('.glass-container');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+
+  </script>
+
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const data = JSON.parse(sessionStorage.getItem('absensiSukses') || '{}');
+
+    if (data.nama) {
+      document.querySelector('h2.font-headline-md').textContent = data.nama;
+    }
+    if (data.jabatan) {
+      document.querySelector('p.font-label-md.text-secondary-fixed').textContent = data.jabatan;
+    }
+    if (data.waktu) {
+      document.querySelector('.font-label-md.font-bold').textContent = data.waktu;
+    }
+
+    const tglEls = document.querySelectorAll('.font-label-md.text-on-surface');
+    const tgl = new Date().toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    if (tglEls[1]) tglEls[1].textContent = tgl;
+
+    if (data.lokasi && tglEls[2]) {
+      tglEls[2].textContent = data.lokasi;
+    }
+
+    if (data.foto) {
+      document.querySelector('.w-16.h-16 img').src = data.foto;
+    }
+});
+
+  </script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

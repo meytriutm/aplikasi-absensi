@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="dark" lang="id" style="">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Geist:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+        background-color: #111318;
+        color: #e2e2e8;
+        overflow-x: hidden;
+    }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .border-light-rule {
+        border-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0)) 1;
+    }
+    .glow-primary {
+        box-shadow: 0 0 30px rgba(173, 198, 255, 0.15);
+    }
+    .shimmer {
+        position: relative;
+        overflow: hidden;
+    }
+    .shimmer::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) rotate(45deg); }
+    }
+  </style>
+  <script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "tertiary": "#d1bcff",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-secondary-fixed": "#002022",
+                    "inverse-surface": "#e2e2e8",
+                    "surface-container-high": "#282a2e",
+                    "on-primary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#23005b",
+                    "on-secondary": "#00363a",
+                    "surface-container-highest": "#333539",
+                    "secondary-container": "#00f1fe",
+                    "primary-container": "#4b8eff",
+                    "outline": "#8b90a0",
+                    "on-tertiary-fixed-variant": "#5700c9",
+                    "secondary-fixed": "#74f5ff",
+                    "on-tertiary": "#3c0090",
+                    "surface-container": "#1e2024",
+                    "secondary": "#ddfcff",
+                    "on-tertiary-container": "#34007f",
+                    "on-primary-container": "#00285c",
+                    "tertiary-fixed": "#e9ddff",
+                    "on-primary-fixed-variant": "#004493",
+                    "surface-bright": "#37393e",
+                    "on-error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#d1bcff",
+                    "background": "#111318",
+                    "surface-dim": "#111318",
+                    "surface-container-low": "#1a1c20",
+                    "on-secondary-fixed-variant": "#004f54",
+                    "surface-variant": "#333539",
+                    "surface-container-lowest": "#0c0e12",
+                    "primary": "#adc6ff",
+                    "surface-tint": "#adc6ff",
+                    "on-primary": "#002e69",
+                    "outline-variant": "#414755",
+                    "primary-fixed": "#d8e2ff",
+                    "inverse-on-surface": "#2f3035",
+                    "on-surface": "#e2e2e8",
+                    "on-background": "#e2e2e8",
+                    "error-container": "#93000a",
+                    "secondary-fixed-dim": "#00dbe7",
+                    "inverse-primary": "#005bc1",
+                    "on-secondary-container": "#006a70",
+                    "on-surface-variant": "#c1c6d7",
+                    "surface": "#111318",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#a178ff"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "spacing": {
+                    "margin-tablet": "32px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "container-max": "1440px",
+                    "unit": "4px",
+                    "gutter": "24px"
+                },
+                "fontFamily": {
+                    "body-md": ["Geist"],
+                    "label-md": ["JetBrains Mono"],
+                    "headline-md": ["Space Grotesk"],
+                    "body-sm": ["Geist"],
+                    "label-sm": ["JetBrains Mono"],
+                    "headline-xl": ["Space Grotesk"],
+                    "headline-lg": ["Space Grotesk"],
+                    "headline-lg-mobile": ["Space Grotesk"],
+                    "body-lg": ["Geist"]
+                },
+                "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                }
+            },
+        },
+    }
+  </script>
+</head>
+<body class="font-body-md text-on-background selection:bg-primary/30">
+  <!-- TopAppBar -->
+  <header class="bg-background/80 backdrop-blur-3xl text-primary fixed top-0 w-full border-b border-white/10 shadow-[0_0_20px_rgba(173,198,255,0.05)] flex justify-between items-center px-margin-mobile h-16 w-full z-50">
+    <div class="flex items-center gap-2 active:scale-95 transition-transform duration-200 cursor-pointer">
+      <span class="material-symbols-outlined" data-icon="security">security</span>
+      
+    </div>
+    <div class="flex items-center gap-4">
+     
+    </div>
+  </header>
+  <!-- Main Content Canvas -->
+  <main class="min-h-screen flex flex-col items-center px-margin-mobile relative overflow-hidden justify-center h-screen">
+    <!-- Ambient Background Decoration -->
+    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary-container/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <!-- Logout Confirmation Card -->
+    <div class="glass-panel w-full max-w-md p-8 md:p-12 text-center relative z-10 shadow-2xl transition-all duration-500 hover:shadow-primary/10 rounded-[32px] rounded-\[64px\]">
+      <!-- Exit Icon Illustration -->
+      <div class="relative inline-flex items-center justify-center mb-8">
+        <div class="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse"></div>
+        <div class="w-24 h-24 rounded-full border border-primary/30 flex items-center justify-center bg-surface-container-lowest/50 backdrop-blur-md relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent"></div>
+          <span class="material-symbols-outlined text-5xl text-primary transition-transform duration-500 group-hover:translate-x-1" data-icon="logout" style="font-variation-settings: 'FILL' 0, 'wght' 300;">logout</span>
+        </div>
+        <!-- Decorative Ring -->
+        <div class="absolute -inset-2 border border-primary/10 rounded-full scale-110 animate-[spin_10s_linear_infinite]"></div>
+      </div>
+      <!-- Content -->
+      <div class="space-y-4">
+        <p class="font-headline-md text-body-lg text-on-surface-variant mb-2"><span class="inline-block px-6 py-1.5 border border-outline-variant/10 rounded-full text-on-surface-variant text-label-md tracking-normal backdrop-blur-sm shadow-inner bg-surface-variant/3">
+            <span id="nama-user" class="text-primary font-bold">Memuat...</span></span></p>
+     <h2 style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:500; letter-spacing:0.3em; color:rgba(226,226,232,0.8); display:flex; align-items:center; gap:16px; justify-content:center;">
+  <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
+  LOGOUT
+  <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
+</h2>
+      </div>
+      <!-- Actions -->
+      <div class="mt-10 flex flex-col gap-4">
+       <button id="btn-logout" class="shimmer bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline-md py-4 shadow-lg hover:shadow-primary/30 active:scale-[0.98] transition-all duration-300 rounded-full">
+        Logout
+        </button>
+        <button id="btn-cancelled" class="bg-transparent border border-white/20 text-on-surface-variant font-headline-md py-4 hover:bg-white/5 hover:text-on-surface transition-all duration-300 active:scale-[0.98] rounded-full">
+        Cancelled
+        </button>
+      </div>
+    </div>
+    <!-- Technical Decoration -->
+
+  </main>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+    authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+    projectId: "aplikasi-absensi-wajah-81014",
+    storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+    messagingSenderId: "30260813821",
+    appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Tampilkan nama user
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (user.email.includes('admin')) {
+      document.getElementById('nama-user').textContent = 'Admin';
+    } else {
+      const q = query(collection(db, 'karyawan'), where('email', '==', user.email));
+      const snapshot = await getDocs(q);
+      let nama = user.email.split('@')[0];
+      if (!snapshot.empty) {
+        nama = snapshot.docs[0].data().nama;
+      }
+      document.getElementById('nama-user').textContent = nama;
+    }
+  });
+
+  // Tombol Logout
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
+  });
+
+  // Tombol Cancelled
+  document.getElementById('btn-cancelled').addEventListener('click', () => {
+    window.history.back();
+  });
+</script>
+
+ 
+
+</body>
+</html>

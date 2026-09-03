@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Daftar Pegawai</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Geist:wght@100;300;400;500;600;700&family=JetBrains+Mono:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#adc6ff", "on-primary": "#002e69", "primary-container": "#4b8eff",
+            "secondary": "#ddfcff", "tertiary": "#d1bcff",
+            "background": "#111318", "surface": "#111318",
+            "surface-container-low": "#1a1c20", "surface-container": "#1e2024",
+            "surface-container-high": "#282a2e", "surface-container-highest": "#333539",
+            "on-surface": "#e2e2e8", "on-surface-variant": "#c1c6d7",
+            "outline-variant": "#414755", "outline": "#8b90a0",
+            "on-primary-fixed": "#001a41", "on-primary-container": "#00285c", "soft-blue": "#70c5ff"
+          },
+          fontFamily: {
+            "body-md": ["Geist"], "body-sm": ["Geist"],
+            "headline-md": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"],
+            "label-sm": ["JetBrains Mono"], "label-md": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "body-md": ["16px", {lineHeight:"24px", fontWeight:"400"}],
+            "body-sm": ["14px", {lineHeight:"20px", fontWeight:"400"}],
+            "headline-md": ["24px", {lineHeight:"32px", fontWeight:"500"}],
+            "label-sm": ["10px", {lineHeight:"14px", letterSpacing:"0.08em", fontWeight:"500"}],
+            "label-md": ["12px", {lineHeight:"16px", letterSpacing:"0.05em", fontWeight:"500"}]
+          },
+          spacing: { "margin-mobile": "16px", "margin-desktop": "64px", "gutter": "24px" }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { min-height: 100dvh; font-family: 'Geist', sans-serif; background-color: #111318; color: #e2e2e8; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(173,198,255,0.2); border-radius: 10px; }
+  </style>
+</head>
+<body class="pb-24">
+
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-surface-container-low/80 backdrop-blur-md border-b border-white/5 shadow-sm">
+  <div class="flex justify-between items-center h-16 px-4 max-w-[1440px] mx-auto">
+  <h1 style="font-family:'Space Grotesk',sans-serif" class="text-2xl font-medium text-primary tracking-tight">Admin Dashboard</h1>
+ <div class="flex items-center gap-2">
+  <a href="logout.html" class="w-8 h-8 rounded-full border border-soft-blue/20 bg-surface-container-low flex items-center justify-center">
+    <span class="material-symbols-outlined text-soft-blue" style="font-size:20px;">account_circle</span>
+  </a>
+</div>
+</div>
+  </header>
+
+  <div class="pt-20 max-w-[1440px] mx-auto px-4">
+
+    <!-- Search + Tambah -->
+    <h2 style="font-family:'Space Grotesk',sans-serif" class="text-lg font-semibold text-on-surface mb-2 mt-2">Daftar Pegawai</h2>
+    <div class="flex gap-3 mb-6 items-center">
+      <div class="relative flex-1 max-w-lg">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant/40">search</span>
+        <input id="search-input" oninput="filterKaryawan()" class="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant/30 focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-on-surface-variant/40 rounded-2xl text-body-md outline-none" placeholder="Cari nama atau posisi..." type="text">
+      </div>
+      <a href="tambah_pegawai.html" class="fixed bottom-20 right-6 w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40">
+  <span class="material-symbols-outlined text-[28px]">person_add</span>
+   </a>
+</div>
+
+    <!-- Tabel -->
+    <div class="bg-surface-container-low border border-outline-variant/30 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-surface-container-high/50 border-b border-outline-variant/50">
+              <th class="px-6 py-5 text-label-md text-primary tracking-wider uppercase" style="font-family:'Space Grotesk',sans-serif">Nama Lengkap</th>
+              <th class="px-6 py-5 text-label-md text-primary tracking-wider uppercase" style="font-family:'Space Grotesk',sans-serif">Posisi</th>
+              <th class="px-6 py-5 text-label-md text-primary tracking-wider uppercase" style="font-family:'Space Grotesk',sans-serif">Status Wajah</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-body" class="divide-y divide-outline-variant/20">
+            <tr>
+              <td colspan="3" class="px-6 py-8 text-center text-on-surface-variant">
+                <span class="material-symbols-outlined animate-spin text-primary">refresh</span>
+                <p class="mt-2">Memuat data...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Jumlah pegawai -->
+    <p id="jumlah-info" class="mt-4 text-on-surface-variant text-sm text-center"></p>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-surface-container-low/90 backdrop-blur-xl border-t border-white/10 flex justify-around items-center h-16 px-2 z-50">
+    <a href="daftar_pegawai.html" class="flex flex-col items-center gap-1 text-primary">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">badge</span>
+      <span class="text-[10px] uppercase font-bold" style="font-family:'Space Grotesk',sans-serif">Staff</span>
+    </a>
+    <a href="log_absensi.html" class="flex flex-col items-center gap-1 text-primary">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">analytics</span>
+      <span class="text-[10px] uppercase font-bold" style="font-family:'Space Grotesk',sans-serif">Laporan</span>
+    </a>
+  </nav>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+    authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+    projectId: "aplikasi-absensi-wajah-81014",
+    storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+    messagingSenderId: "30260813821",
+    appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  let semuaKaryawan = [];
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+    const emailPrefix = user.email.split('@')[0];
+    const nama = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1).replace('absen', ' Absen');
+   document.getElementById('nama-user').textContent = user.email.includes('admin') ? 'Admin' : nama;
+  });
+
+  const snapshot = await getDocs(collection(db, 'karyawan'));
+  snapshot.forEach(doc => {
+    semuaKaryawan.push({ id: doc.id, ...doc.data() });
+  });
+
+  tampilkanKaryawan(semuaKaryawan);
+  document.getElementById('jumlah-info').textContent = `Total ${semuaKaryawan.length} pegawai terdaftar`;
+
+  function tampilkanKaryawan(list) {
+    const tbody = document.getElementById('tabel-body');
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-on-surface-variant">Tidak ada data pegawai</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(k => {
+      const inisial = k.nama ? k.nama.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+      const adaFoto = k.fotoWajah ? true : false;
+
+      return `
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="px-6 py-5">
+            <div>
+              <p class="text-on-surface font-medium">${k.nama}</p>
+              <p class="text-on-surface-variant text-xs">${k.email}</p>
+            </div>
+          </td>
+          <td class="px-6 py-5 text-on-surface-variant">${k.jabatan}</td>
+          <td class="px-6 py-5">
+            ${adaFoto
+              ? `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 text-xs font-medium">
+                  <span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                  Terdaftar
+                </span>`
+              : `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-900/40 text-red-400 border border-red-500/30 text-xs font-medium">
+                  <span class="material-symbols-outlined text-[14px]">cancel</span>
+                  Belum Daftar
+                </span>`
+            }
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.filterKaryawan = () => {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const filtered = semuaKaryawan.filter(k =>
+      k.nama?.toLowerCase().includes(keyword) ||
+      k.jabatan?.toLowerCase().includes(keyword)
+    );
+    tampilkanKaryawan(filtered);
+  };
+</script>
+</body>
+</html>

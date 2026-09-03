@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Riwayat Aktivitas</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Geist:wght@100;300;400;500;600;700&family=JetBrains+Mono:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#adc6ff", "on-primary": "#002e69",
+            "background": "#111318", "surface": "#111318",
+            "surface-container-low": "#1a1c20", "surface-container": "#1e2024",
+            "surface-container-high": "#282a2e",
+            "on-surface": "#e2e2e8", "on-surface-variant": "#c1c6d7",
+            "outline-variant": "#414755", "outline": "#8b90a0",
+            "on-primary-fixed": "#001a41"
+          },
+          fontFamily: {
+            "body-md": ["Geist"], "body-sm": ["Geist"],
+            "headline-md": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"],
+            "label-sm": ["JetBrains Mono"], "label-md": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "body-md": ["16px", {lineHeight:"24px", fontWeight:"400"}],
+            "body-sm": ["14px", {lineHeight:"20px", fontWeight:"400"}],
+            "headline-md": ["24px", {lineHeight:"32px", fontWeight:"500"}],
+            "label-sm": ["10px", {lineHeight:"14px", letterSpacing:"0.08em", fontWeight:"500"}],
+            "label-md": ["12px", {lineHeight:"16px", letterSpacing:"0.05em", fontWeight:"500"}]
+          },
+          spacing: { "margin-mobile": "16px" }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0A0C10; color: #e2e2e8; font-family: 'Space Grotesk', sans-serif; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+    .glass-card::before { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%); pointer-events: none; }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-surface-container-low/40 backdrop-blur-[40px] border-b border-white/10 h-16 px-6 flex items-center gap-4">
+    <a href="verifikasi_identitas.html" class="text-primary">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 style="font-family:'Space Grotesk',sans-serif" class="text-2xl font-medium text-primary">Riwayat Aktivitas</h1>
+  </header>
+
+  <main class="pt-24 pb-24 px-4 min-h-screen max-w-4xl mx-auto">
+
+    <!-- Filter Tanggal -->
+    <div class="glass-card rounded-xl px-4 py-4 flex items-center justify-between mb-4 cursor-pointer" onclick="document.getElementById('filter-tanggal').showPicker()">
+      <div class="flex items-center gap-4">
+        <span class="material-symbols-outlined text-primary">calendar_today</span>
+        <span id="label-tanggal" style="font-family:'Space Grotesk',sans-serif" class="text-on-surface text-lg">Semua Tanggal</span>
+      </div>
+      <span class="material-symbols-outlined text-outline">expand_more</span>
+      <input id="filter-tanggal" type="date" class="absolute opacity-0 w-0 h-0" onchange="filterData()">
+    </div>
+
+    <!-- Info jumlah -->
+    <p id="info-jumlah" class="text-on-surface-variant text-sm mb-4 text-center"></p>
+
+    <!-- Tabel -->
+    <div class="glass-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 bg-white/5">
+              <th class="px-4 py-4 text-[10px] text-outline uppercase tracking-wider" style="font-family:'JetBrains Mono',monospace">Nama Lengkap</th>
+              <th class="px-4 py-4 text-[10px] text-outline uppercase tracking-wider text-center" style="font-family:'JetBrains Mono',monospace">Tanggal</th>
+              <th class="px-4 py-4 text-[10px] text-outline uppercase tracking-wider text-center" style="font-family:'JetBrains Mono',monospace">Waktu</th>
+              <th class="px-4 py-4 text-[10px] text-outline uppercase tracking-wider text-center" style="font-family:'JetBrains Mono',monospace">Lokasi</th>
+              <th class="px-4 py-4 text-[10px] text-outline uppercase tracking-wider text-right" style="font-family:'JetBrains Mono',monospace">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-body" class="divide-y divide-white/5">
+            <tr>
+              <td colspan="5" class="px-4 py-8 text-center text-on-surface-variant">
+                <span class="material-symbols-outlined animate-spin text-primary">refresh</span>
+                <p class="mt-2 text-sm">Memuat riwayat...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 py-3 bg-[#111318]/95 backdrop-blur-lg border-t border-white/10">
+    <a href="#" class="flex flex-col items-center text-primary">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">history</span>
+      <span class="font-label-sm text-[10px] mt-1">Riwayat</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+      authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+      projectId: "aplikasi-absensi-wajah-81014",
+      storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+      messagingSenderId: "30260813821",
+      appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let semuaAbsensi = [];
+
+    onAuthStateChanged(auth, async (user) => {
+      const emailKaryawan = (user && user.email) ? user.email : sessionStorage.getItem('emailKaryawan');
+
+      if (!emailKaryawan) {
+        document.getElementById('tabel-body').innerHTML = `
+          <tr><td colspan="5" class="px-4 py-8 text-center text-on-surface-variant">
+            Silakan absen terlebih dahulu
+          </td></tr>`;
+        return;
+      }
+
+      const q = query(collection(db, 'absensi'), where('email', '==', emailKaryawan));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(doc => semuaAbsensi.push(doc.data()));
+
+      semuaAbsensi.sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+      tampilkan(semuaAbsensi);
+    });
+
+    function tampilkan(list) {
+      const tbody = document.getElementById('tabel-body');
+      document.getElementById('info-jumlah').textContent = `Menampilkan ${list.length} data absensi`;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-on-surface-variant">Tidak ada data</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(a => {
+        const waktu = a.waktu ? new Date(a.waktu).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + ' WIB' : '-';
+        const tanggal = a.tanggal || '-';
+        const isMasuk = a.status === 'masuk';
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="px-4 py-4">
+              <p class="text-on-surface font-medium">${a.nama || '-'}</p>
+              <p class="text-outline text-xs">${a.jabatan || '-'}</p>
+            </td>
+            <td class="px-4 py-4 text-center text-on-surface-variant text-sm">${tanggal}</td>
+            <td class="px-4 py-4 text-center text-on-surface-variant text-sm">${waktu}</td>
+            <td class="px-4 py-4 text-center text-on-surface-variant text-sm">${a.lokasi || '-'}</td>
+            <td class="px-4 py-4 text-right">
+              <span class="font-bold text-sm" style="color: ${isMasuk ? '#82E0AA' : '#E57373'}">
+                ${isMasuk ? 'MASUK' : 'KELUAR'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.filterData = () => {
+      const tanggal = document.getElementById('filter-tanggal').value;
+      if (tanggal) {
+        const tglFormatted = new Date(tanggal).toLocaleDateString('id-ID');
+        document.getElementById('label-tanggal').textContent = tglFormatted;
+      }
+      const filtered = semuaAbsensi.filter(a => {
+        return !tanggal || a.tanggal === new Date(tanggal).toLocaleDateString('id-ID');
+      });
+      tampilkan(filtered);
+    };
+  </script>
+</body>
+</html>

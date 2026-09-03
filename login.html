@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Absensi</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Space Grotesk', 'sans-serif'] },
+          colors: {
+            'axon-dark': '#111318', 'axon-card': '#1a1c20',
+            'axon-blue': '#007aff', 'axon-cyan': '#22d3ee',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0c0e12; color: #ffffff; }
+    .bg-grid {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow-primary { box-shadow: 0 0 20px rgba(0,122,255,0.3); }
+    .glow-secondary { box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Modal */
+    #modal-admin { display: none; }
+    #modal-admin.aktif { display: flex; }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px #0c0e12 inset !important;
+      -webkit-text-fill-color: #e2e2e8 !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col bg-grid relative">
+
+  <!-- Light leak -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-axon-blue/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+  <main class="flex-grow flex flex-col items-center justify-center px-6 z-10">
+    <!-- Logo -->
+    <div class="mb-12 flex flex-col items-center">
+      <div class="w-16 h-16 bg-axon-card border border-white/10 rounded-2xl flex items-center justify-center mb-4 shadow-xl">
+        <svg class="text-axon-blue" fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="32">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+      </div>
+      <h1 class="text-xs font-bold tracking-[0.4em] text-white/40 uppercase">ABSENSI</h1>
+    </div>
+
+    <!-- Card -->
+    <section class="w-full max-w-sm bg-axon-card/80 backdrop-blur-xl p-8 shadow-2xl border border-white/5 rounded-3xl">
+      <div class="mb-8 text-center">
+        <h2 class="text-white text-2xl font-semibold mb-2">Silakan Absen</h2>
+        <p class="text-white/50 text-sm">Pilih absensi anda hari ini</p>
+      </div>
+
+      <!-- Jam & Tanggal -->
+      <div class="text-center mb-8">
+        <p id="jam" class="text-white text-3xl font-bold tracking-widest"></p>
+        <p id="tanggal" class="text-white/40 text-sm mt-1"></p>
+      </div>
+
+      <!-- Tombol Absen -->
+      <div class="space-y-4">
+        <button onclick="absen('masuk')" class="w-full bg-gradient-to-r from-axon-blue to-[#00a2ff] hover:brightness-110 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all glow-primary">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">login</span>
+          Absen Masuk
+        </button>
+        <button onclick="absen('keluar')" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:brightness-110 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all glow-secondary">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">logout</span>
+          Absen Keluar
+        </button>
+      </div>
+    </section>
+
+    <!-- Tombol Admin -->
+    <button onclick="bukaAdmin()" class="mt-8 text-white/20 hover:text-white/50 text-xs flex items-center gap-1 transition-colors">
+      <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+      Login Admin
+    </button>
+  </main>
+
+  <!-- Modal Admin Login -->
+  <div id="modal-admin" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center px-6">
+    <div class="w-full max-w-sm bg-axon-card border border-white/10 rounded-3xl p-8 shadow-2xl relative">
+      <button onclick="tutupAdmin()" class="absolute top-4 right-4 text-white/30 hover:text-white transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <h3 class="text-white text-xl font-semibold mb-6">Login Admin</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold tracking-[0.2em] text-white/40 mb-2">EMAIL</label>
+          <input id="admin-email" type="email" placeholder="admin@email.com" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-axon-blue transition-all">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold tracking-[0.2em] text-white/40 mb-2">PASSWORD</label>
+          <input id="admin-password" type="password" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-axon-blue transition-all">
+        </div>
+        <div id="pesan-admin" class="hidden text-red-400 text-sm text-center"></div>
+        <button onclick="loginAdmin()" class="w-full bg-gradient-to-r from-axon-blue to-[#00a2ff] text-white font-bold py-3 rounded-xl transition-all hover:brightness-110 glow-primary">
+          Masuk
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+      authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+      projectId: "aplikasi-absensi-wajah-81014",
+      storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+      messagingSenderId: "30260813821",
+      appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Jam & Tanggal realtime
+    function updateWaktu() {
+      const now = new Date();
+      document.getElementById('jam').textContent = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      document.getElementById('tanggal').textContent = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    }
+    updateWaktu();
+    setInterval(updateWaktu, 1000);
+
+    // Absen langsung ke verifikasi
+    window.absen = (status) => {
+      sessionStorage.setItem('statusAbsen', status);
+      window.location.href = 'verifikasi_identitas.html';
+    };
+
+    // Modal admin
+    window.bukaAdmin = () => document.getElementById('modal-admin').classList.add('aktif');
+    window.tutupAdmin = () => document.getElementById('modal-admin').classList.remove('aktif');
+
+    // Login admin
+    window.loginAdmin = () => {
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      const pesan = document.getElementById('pesan-admin');
+
+      if (!email || !password) {
+        pesan.textContent = 'Email dan password harus diisi!';
+        pesan.classList.remove('hidden');
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          if (user.email.includes('admin')) {
+            window.location.href = 'daftar_pegawai.html';
+          } else {
+            pesan.textContent = 'Akun ini bukan admin!';
+            pesan.classList.remove('hidden');
+          }
+        })
+        .catch(() => {
+          pesan.textContent = 'Email atau password salah!';
+          pesan.classList.remove('hidden');
+        });
+    };
+  </script>
+</body>
+</html>

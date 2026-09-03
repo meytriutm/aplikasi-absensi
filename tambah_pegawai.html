@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Tambah Pegawai</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#adc6ff", "on-primary": "#002e69", "primary-container": "#4b8eff",
+            "background": "#111318", "surface": "#111318", "surface-container-low": "#1a1c20",
+            "surface-container": "#1e2024", "surface-container-highest": "#333539",
+            "surface-container-lowest": "#0c0e12", "on-surface": "#e2e2e8",
+            "on-surface-variant": "#c1c6d7", "outline": "#8b90a0", "outline-variant": "#414755",
+            "on-primary-fixed": "#001a41", "error": "#ffb4ab"
+          },
+          fontFamily: {
+            "body-md": ["Geist"], "body-sm": ["Geist"],
+            "headline-md": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"],
+            "label-sm": ["JetBrains Mono"], "label-md": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "body-md": ["16px", {lineHeight:"24px", fontWeight:"400"}],
+            "body-sm": ["14px", {lineHeight:"20px", fontWeight:"400"}],
+            "headline-md": ["24px", {lineHeight:"32px", fontWeight:"500"}],
+            "headline-lg-mobile": ["28px", {lineHeight:"36px", fontWeight:"600"}],
+            "label-sm": ["10px", {lineHeight:"14px", letterSpacing:"0.08em", fontWeight:"500"}],
+            "label-md": ["12px", {lineHeight:"16px", letterSpacing:"0.05em", fontWeight:"500"}]
+          },
+          spacing: { "margin-mobile": "16px", "gutter": "24px" }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #111318; color: #e2e2e8; -webkit-font-smoothing: antialiased; min-height: 100dvh; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+#preview-foto { display: none; }
+#kamera-modal { display: none; }
+#kamera-modal.aktif { display: flex; }
+input, select {
+  background-color: transparent !important;
+  color: #e2e2e8 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #0c0e12 inset !important;
+  -webkit-text-fill-color: #e2e2e8 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+#video {
+  transform: scaleX(-1);
+}
+  </style>
+</head>
+<body class="font-body-md min-h-screen">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 w-full z-50 flex items-center px-4 h-16 bg-surface/10 backdrop-blur-xl border-b border-white/10">
+    <button onclick="window.history.back()" class="mr-4 text-primary active:scale-95 transition-transform">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1 class="font-headline-md text-headline-md text-primary">Tambah Pegawai</h1>
+  </header>
+
+  <main class="pt-24 pb-32 px-4 max-w-lg mx-auto">
+    <p class="text-on-surface-variant mb-8">Lengkapi data pegawai baru untuk didaftarkan ke dalam sistem.</p>
+
+    <div class="space-y-6">
+      <!-- Nama -->
+      <div class="space-y-2">
+        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">Nama Lengkap</label>
+        <input id="input-nama" class="w-full bg-black/20 border-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-on-surface-variant/40 outline-none" placeholder="Contoh: Budi Santoso" type="text">
+      </div>
+
+      <!-- Email -->
+      <div class="space-y-2">
+        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">Email</label>
+        <input id="input-email" class="w-full bg-black/20 border-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-on-surface-variant/40 outline-none" placeholder="budi@kantor.com" type="email">
+      </div>
+
+      <!-- Jabatan -->
+        <div class="space-y-2">
+        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">Posisi / Jabatan</label>
+        <input id="input-jabatan" class="w-full bg-black/20 border-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-on-surface-variant/40 outline-none" placeholder="Contoh: Staff Admin" type="text">
+        </div>
+
+      <!-- Foto Wajah -->
+      <div class="space-y-4 pt-4">
+        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest block">Pendaftaran Wajah</label>
+
+        <!-- Tombol buka kamera -->
+        <button id="btn-kamera" onclick="bukakamera()" class="w-full relative overflow-hidden rounded-xl bg-white/5 border border-white/10 p-6 flex flex-col items-center justify-center transition-all hover:bg-white/10 active:scale-[0.98]">
+          <div class="shimmer absolute inset-0 opacity-20"></div>
+          <div class="relative mb-4">
+            <div class="w-20 h-20 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-primary">face_unlock</span>
+            </div>
+            <div class="absolute -bottom-1 -right-1 bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">add</span>
+            </div>
+          </div>
+          <span class="font-body-md font-semibold text-primary mb-1">Mulai Pendaftaran Wajah</span>
+          <span class="font-body-sm text-on-surface-variant text-center px-4">Pastikan pencahayaan cukup untuk hasil terbaik.</span>
+        </button>
+
+        <!-- Preview foto -->
+        <div id="preview-foto" class="rounded-xl border border-primary/30 bg-surface-container-lowest/40 p-4 flex items-center space-x-4">
+          <img id="img-preview" class="w-16 h-16 rounded-full object-cover border-2 border-primary/40" src="" alt="Preview wajah">
+          <div class="flex-1">
+            <p class="text-primary font-body-md font-semibold">Foto berhasil diambil ✓</p>
+            <p class="text-on-surface-variant font-body-sm">Klik tombol di atas untuk mengambil ulang</p>
+          </div>
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">check_circle</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pesan error/sukses -->
+    <div id="pesan" class="mt-6 hidden p-4 rounded-xl text-center font-body-md"></div>
+
+    <!-- Simpan -->
+    <div class="mt-8">
+      <button onclick="simpanData()" class="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline-lg-mobile text-lg font-bold active:scale-[0.97] transition-all hover:brightness-110 shadow-[0_0_20px_rgba(173,198,255,0.3)]">
+        Simpan Data
+      </button>
+    </div>
+  </main>
+
+  <!-- Modal Kamera -->
+  <div id="kamera-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm items-center justify-center flex-col gap-4 p-4">
+    <div class="w-full max-w-sm rounded-2xl overflow-hidden border border-primary/30 bg-surface-container relative">
+      <video id="video" autoplay playsinline class="w-full aspect-square object-cover"></video>
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-4 left-4 w-10 h-10 border-t-2 border-l-2 border-primary/60"></div>
+        <div class="absolute top-4 right-4 w-10 h-10 border-t-2 border-r-2 border-primary/60"></div>
+        <div class="absolute bottom-4 left-4 w-10 h-10 border-b-2 border-l-2 border-primary/60"></div>
+        <div class="absolute bottom-4 right-4 w-10 h-10 border-b-2 border-r-2 border-primary/60"></div>
+      </div>
+    </div>
+    <canvas id="canvas" class="hidden"></canvas>
+    <div class="flex gap-4 w-full max-w-sm">
+      <button onclick="tutupKamera()" class="flex-1 py-3 rounded-xl border border-white/20 text-on-surface-variant font-body-md">Batal</button>
+      <button onclick="ambilFoto()" class="flex-1 py-3 rounded-xl bg-primary text-on-primary font-body-md font-semibold">📸 Ambil Foto</button>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-surface-container-low/90 backdrop-blur-xl border-t border-white/10 flex justify-around items-center h-16 px-2 z-50">
+    <a href="#" class="flex flex-col items-center gap-1 text-primary">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">person</span>
+      <span class="text-[10px] uppercase font-bold" style="font-family:'Space Grotesk',sans-serif">Pegawai</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3wnAabg6gO3WAMytkH0fo1MuFcRnpFkk",
+      authDomain: "aplikasi-absensi-wajah-81014.firebaseapp.com",
+      projectId: "aplikasi-absensi-wajah-81014",
+      storageBucket: "aplikasi-absensi-wajah-81014.firebasestorage.app",
+      messagingSenderId: "30260813821",
+      appId: "1:30260813821:web:9d69727f8886cbf62c8394"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let fotoBase64 = null;
+    let stream = null;
+
+    window.bukakamera = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        document.getElementById('video').srcObject = stream;
+        document.getElementById('kamera-modal').classList.add('aktif');
+      } catch (err) {
+        tampilPesan('Kamera tidak bisa diakses: ' + err.message, 'error');
+      }
+    };
+
+    window.tutupKamera = () => {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      document.getElementById('kamera-modal').classList.remove('aktif');
+    };
+
+    window.ambilFoto = () => {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      fotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+      document.getElementById('img-preview').src = fotoBase64;
+      document.getElementById('preview-foto').style.display = 'flex';
+      tutupKamera();
+    };
+
+    window.simpanData = async () => {
+      const nama = document.getElementById('input-nama').value.trim();
+      const email = document.getElementById('input-email').value.trim();
+      const jabatan = document.getElementById('input-jabatan').value;
+
+      if (!nama || !email || !jabatan) {
+        tampilPesan('Semua field harus diisi!', 'error');
+        return;
+      }
+      if (!fotoBase64) {
+        tampilPesan('Foto wajah belum diambil!', 'error');
+        return;
+      }
+
+      try {
+        tampilPesan('Menyimpan data...', 'info');
+        await addDoc(collection(db, 'karyawan'), {
+          nama, email, jabatan,
+          fotoWajah: fotoBase64,
+          createdAt: new Date().toISOString()
+        });
+        tampilPesan('✅ Data pegawai berhasil disimpan!', 'sukses');
+        // Reset form
+        document.getElementById('input-nama').value = '';
+        document.getElementById('input-email').value = '';
+        document.getElementById('input-jabatan').value = '';
+        fotoBase64 = null;
+        document.getElementById('preview-foto').style.display = 'none';
+      } catch (err) {
+        tampilPesan('Gagal menyimpan: ' + err.message, 'error');
+      }
+    };
+
+    function tampilPesan(teks, tipe) {
+      const el = document.getElementById('pesan');
+      el.textContent = teks;
+      el.className = 'mt-6 p-4 rounded-xl text-center font-body-md';
+      if (tipe === 'error') el.classList.add('bg-red-900/40', 'text-red-300', 'border', 'border-red-500/30');
+      else if (tipe === 'sukses') el.classList.add('bg-green-900/40', 'text-green-300', 'border', 'border-green-500/30');
+      else el.classList.add('bg-primary/10', 'text-primary', 'border', 'border-primary/30');
+      el.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
